@@ -8,4 +8,7 @@ const app = express();
 
 app.use(cors());
 
+// routes
+app.use("/api/search", require("./routes/searchResults.js"));
+
 app.listen(PORT, () => console.log(`app started on port: ${PORT}`));
