@@ -1,5 +1,10 @@
 <template>
   <div class="h-screen relative">
+    <GeoErrorModal
+      v-if="geoError"
+      :geoErrorMsg="geoErrorMsg"
+      @closeGeoError="closeGeoError"
+    />
     <div id="mapid" class="h-full z-[1]"></div>
   </div>
 </template>
@@ -7,9 +12,10 @@
 <script>
 import leaflet from "leaflet";
 import { onMounted, ref } from "vue";
+import GeoErrorModal from "../components/GeoErrorModal.vue";
 export default {
   name: "HomeView",
-  components: {},
+  components: { GeoErrorModal },
   setup() {
     let map;
     onMounted(() => {
@@ -41,6 +47,8 @@ export default {
     const coords = ref(null);
     const fetchCoords = ref(null);
     const geoMarker = ref(null);
+    const geoError = ref(true);
+    const geoErrorMsg = ref(null);
 
     const getGelocation = () => {
       // check to see if we have coods in session sotrage
@@ -75,7 +83,8 @@ export default {
     const getLocError = (error) => {
       // stop fetching coords
       fetchCoords.value = null;
-      console.warn(error);
+      geoError.value = true;
+      geoErrorMsg.value = error.message;
     };
 
     const plotGeoLocation = (coords) => {
@@ -93,6 +102,13 @@ export default {
       // set map view to current location
       map.setView([coords.lat, coords.lng], 10);
     };
+
+    const closeGeoError = () => {
+      geoErrorMsg.value = null;
+      geoError.value = null;
+    };
+
+    return { geoError, closeGeoError, geoErrorMsg };
   },
 };
 </script>
