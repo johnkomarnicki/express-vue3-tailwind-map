@@ -43,6 +43,14 @@ export default {
     const geoMarker = ref(null);
 
     const getGelocation = () => {
+      // check to see if we have coods in session sotrage
+      if (sessionStorage.getItem("coords")) {
+        coords.value = JSON.parse(sessionStorage.getItem("coords"));
+        plotGeoLocation(coords.value);
+        return;
+      }
+
+      // else get coords from geolocation API
       fetchCoords.value = true;
       navigator.geolocation.getCurrentPosition(setCoords, getLocError);
     };
@@ -52,16 +60,16 @@ export default {
       fetchCoords.value = null;
 
       // set coords in session storage
-      const sessionCoords = {
+      const setSessionCoords = {
         lat: pos.coords.latitude,
         lng: pos.coords.longitude,
       };
-      sessionStorage.setItem("coords", JSON.stringify(setCoords));
+      sessionStorage.setItem("coords", JSON.stringify(setSessionCoords));
 
       // set ref coords value
-      coords.value = sessionCoords;
+      coords.value = setSessionCoords;
 
-      plotGeoLocation(coords);
+      plotGeoLocation(coords.value);
     };
 
     const getLocError = (error) => {
@@ -79,11 +87,11 @@ export default {
 
       // create new marker with coords and custom marker
       geoMarker.value = leaflet
-        .marker([coords.value.lat, coords.value.lng], { icon: customMarker })
+        .marker([coords.lat, coords.lng], { icon: customMarker })
         .addTo(map);
 
       // set map view to current location
-      map.setView([coords.value.lat, coords.value.lng], 10);
+      map.setView([coords.lat, coords.lng], 10);
     };
   },
 };
