@@ -5,6 +5,12 @@
       :geoErrorMsg="geoErrorMsg"
       @closeGeoError="closeGeoError"
     />
+    <MapFeatures
+      :fetchCoords="fetchCoords"
+      :coords="coords"
+      @getGeolocation="getGeolocation"
+      class="w-full md:w-auto absolute md:top-[40px] md:left-[60px] z-[2]"
+    />
     <div id="mapid" class="h-full z-[1]"></div>
   </div>
 </template>
@@ -13,9 +19,10 @@
 import leaflet from "leaflet";
 import { onMounted, ref } from "vue";
 import GeoErrorModal from "../components/GeoErrorModal.vue";
+import MapFeatures from "../components/MapFeatures.vue";
 export default {
   name: "HomeView",
-  components: { GeoErrorModal },
+  components: { GeoErrorModal, MapFeatures },
   setup() {
     let map;
     onMounted(() => {
@@ -41,26 +48,35 @@ export default {
         .addTo(map);
 
       // get users location
-      getGelocation();
+      getGeolocation();
     });
 
     const coords = ref(null);
     const fetchCoords = ref(null);
     const geoMarker = ref(null);
-    const geoError = ref(true);
+    const geoError = ref(null);
     const geoErrorMsg = ref(null);
 
-    const getGelocation = () => {
-      // check to see if we have coods in session sotrage
-      if (sessionStorage.getItem("coords")) {
-        coords.value = JSON.parse(sessionStorage.getItem("coords"));
-        plotGeoLocation(coords.value);
+    const getGeolocation = () => {
+      // if function is called, only run if we dont have coords
+      if (!coords.value) {
+        // check to see if we have coods in session sotrage
+        if (sessionStorage.getItem("coords")) {
+          coords.value = JSON.parse(sessionStorage.getItem("coords"));
+          plotGeoLocation(coords.value);
+          return;
+        }
+
+        // else get coords from geolocation API
+        fetchCoords.value = true;
+        navigator.geolocation.getCurrentPosition(setCoords, getLocError);
         return;
       }
 
-      // else get coords from geolocation API
-      fetchCoords.value = true;
-      navigator.geolocation.getCurrentPosition(setCoords, getLocError);
+      // otherwise, remove location
+      coords.value = null;
+      sessionStorage.removeItem("coords");
+      map.removeLayer(geoMarker.value);
     };
 
     const setCoords = (pos) => {
@@ -108,7 +124,7 @@ export default {
       geoError.value = null;
     };
 
-    return { geoError, closeGeoError, geoErrorMsg };
+    return { geoError, closeGeoError, geoErrorMsg, fetchCoords, coords, getGeolocation };
   },
 };
 </script>
