@@ -8,8 +8,10 @@
     <MapFeatures
       :fetchCoords="fetchCoords"
       :coords="coords"
+      @toggleSearchResults="toggleSearchResults"
       @getGeolocation="getGeolocation"
       @plotResult="plotResult"
+      :searchResults="searchResults"
       class="w-full md:w-auto absolute md:top-[40px] md:left-[60px] z-[2]"
     />
     <div id="mapid" class="h-full z-[1]"></div>
@@ -47,6 +49,10 @@ export default {
           }
         )
         .addTo(map);
+
+      map.on("moveend", () => {
+        closeSearchResults();
+      });
 
       // get users location
       getGeolocation();
@@ -141,6 +147,14 @@ export default {
       geoError.value = null;
     };
 
+    const searchResults = ref(null);
+    const toggleSearchResults = () => {
+      searchResults.value = !searchResults.value;
+    };
+    const closeSearchResults = () => {
+      searchResults.value = null;
+    };
+
     return {
       geoError,
       closeGeoError,
@@ -149,6 +163,9 @@ export default {
       coords,
       getGeolocation,
       plotResult,
+      searchResults,
+      toggleSearchResults,
+      closeSearchResults,
     };
   },
 };

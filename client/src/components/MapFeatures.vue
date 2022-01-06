@@ -11,6 +11,7 @@
         placeholder="Start your search..."
         v-model="searchQuery"
         @input="search"
+        @focus="$emit('toggleSearchResults')"
       />
       <!-- Search Icon -->
       <div class="absolute top-0 left-[8px] h-full flex items-center">
@@ -19,7 +20,10 @@
       <!-- Search Results -->
       <div class="absolute mt-[8px] w-full">
         <!-- Search Queries -->
-        <div v-if="searchQuery" class="h-[200px] overflow-scroll bg-white rounded-md">
+        <div
+          v-if="searchQuery && searchResults"
+          class="h-[200px] overflow-scroll bg-white rounded-md"
+        >
           <!-- Loading Spinner -->
           <LoadingSpinner v-if="!searchData" />
           <!-- Display Results -->
@@ -56,7 +60,7 @@ import { ref } from "vue";
 import axios from "axios";
 import LoadingSpinner from "./LoadingSpinner.vue";
 export default {
-  props: ["fetchCoords", "coords"],
+  props: ["fetchCoords", "coords", "searchResults"],
   components: { LoadingSpinner },
   setup(props, { emit }) {
     const searchQuery = ref(null);
