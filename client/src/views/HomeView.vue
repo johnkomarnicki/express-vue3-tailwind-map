@@ -9,6 +9,7 @@
       :fetchCoords="fetchCoords"
       :coords="coords"
       @getGeolocation="getGeolocation"
+      @plotResult="plotResult"
       class="w-full md:w-auto absolute md:top-[40px] md:left-[60px] z-[2]"
     />
     <div id="mapid" class="h-full z-[1]"></div>
@@ -119,12 +120,36 @@ export default {
       map.setView([coords.lat, coords.lng], 10);
     };
 
+    const resultMarker = ref(null);
+    const plotResult = (coords) => {
+      // If there is already a marker, remove it. Only allow 1
+      if (resultMarker.value) {
+        map.removeLayer(resultMarker.value);
+      }
+      const customMarker = leaflet.icon({
+        iconUrl: require("../assets/map-marker-blue.svg"),
+        iconSize: [35, 35], // size of the icon
+      });
+      resultMarker.value = leaflet
+        .marker([coords.coordinates[1], coords.coordinates[0]], { icon: customMarker })
+        .addTo(map);
+      map.setView([coords.coordinates[1], coords.coordinates[0]], 13);
+    };
+
     const closeGeoError = () => {
       geoErrorMsg.value = null;
       geoError.value = null;
     };
 
-    return { geoError, closeGeoError, geoErrorMsg, fetchCoords, coords, getGeolocation };
+    return {
+      geoError,
+      closeGeoError,
+      geoErrorMsg,
+      fetchCoords,
+      coords,
+      getGeolocation,
+      plotResult,
+    };
   },
 };
 </script>
