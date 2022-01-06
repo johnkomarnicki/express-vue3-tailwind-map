@@ -12,5 +12,3 @@ export default {
   name: "loadingSpinner",
 };
 </script>
-
-<style></style>

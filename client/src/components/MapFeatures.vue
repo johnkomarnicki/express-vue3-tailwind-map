@@ -19,14 +19,19 @@
       <!-- Search Results -->
       <div class="absolute mt-[8px] w-full">
         <!-- Search Queries -->
-        <div class="h-[200px] overflow-scroll bg-white rounded-md">
+        <div v-if="searchQuery" class="h-[200px] overflow-scroll bg-white rounded-md">
           <!-- Loading Spinner -->
+          <LoadingSpinner v-if="!searchData" />
           <!-- Display Results -->
-          <div
-            class="px-4 py-2 flex gap-x-2 cursor-pointer hover:bg-slate-600 hover:text-white"
-          >
-            <i class="fas fa-map-marker-alt"></i>
-            <p class="text-[12px]">Testing Result</p>
+          <div v-else>
+            <div
+              class="px-4 py-2 flex gap-x-2 cursor-pointer hover:bg-slate-600 hover:text-white"
+              v-for="(result, index) in searchData"
+              :key="index"
+            >
+              <i class="fas fa-map-marker-alt"></i>
+              <p class="text-[12px]">{{ result.place_name_en }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -48,8 +53,10 @@
 <script>
 import { ref } from "vue";
 import axios from "axios";
+import LoadingSpinner from "./LoadingSpinner.vue";
 export default {
   props: ["fetchCoords", "coords"],
+  components: { LoadingSpinner },
   setup(props) {
     const searchQuery = ref(null);
     const searchData = ref(null);
@@ -77,7 +84,7 @@ export default {
       }, 750);
     };
 
-    return { searchQuery, search };
+    return { searchQuery, search, searchData };
   },
 };
 </script>
