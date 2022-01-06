@@ -9,6 +9,8 @@
         class="pl-9 pr-4 py-3 text-[14px] focus:outline-none w-full shadow-md rounded-md"
         type="text"
         placeholder="Start your search..."
+        v-model="searchQuery"
+        @input="search"
       />
       <!-- Search Icon -->
       <div class="absolute top-0 left-[8px] h-full flex items-center">
@@ -44,7 +46,38 @@
 </template>
 
 <script>
+import { ref } from "vue";
+import axios from "axios";
 export default {
   props: ["fetchCoords", "coords"],
+  setup(props) {
+    const searchQuery = ref(null);
+    const searchData = ref(null);
+    const queryTimeout = ref(null);
+
+    const search = () => {
+      clearTimeout(queryTimeout.value);
+
+      // reset data on a new search
+      searchData.value = null;
+      queryTimeout.value = setTimeout(async () => {
+        // Only make search, if there is value in query input
+        if (searchQuery.value !== "") {
+          const params = new URLSearchParams({
+            fuzzyMatch: true,
+            language: "en",
+            limit: 10,
+            proximity: props.coords ? `${props.coords.lng},${props.coords.lat}` : "0,0",
+          });
+          const data = await axios.get(
+            `http://localhost:3200/api/search/${searchQuery.value}?${params}`
+          );
+          searchData.value = data.data.features;
+        }
+      }, 750);
+    };
+
+    return { searchQuery, search };
+  },
 };
 </script>
