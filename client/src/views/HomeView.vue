@@ -144,7 +144,7 @@ export default {
     };
 
     const removeResult = () => {
-      mymap.removeLayer(resultMarker.value);
+      map.removeLayer(resultMarker.value);
     };
 
     const closeGeoError = () => {
