@@ -11,6 +11,7 @@
       @toggleSearchResults="toggleSearchResults"
       @getGeolocation="getGeolocation"
       @plotResult="plotResult"
+      @removeResult="removeResult"
       :searchResults="searchResults"
       class="w-full md:w-auto absolute md:top-[40px] md:left-[60px] z-[2]"
     />
@@ -142,6 +143,10 @@ export default {
       map.setView([coords.coordinates[1], coords.coordinates[0]], 13);
     };
 
+    const removeResult = () => {
+      mymap.removeLayer(resultMarker.value);
+    };
+
     const closeGeoError = () => {
       geoErrorMsg.value = null;
       geoError.value = null;
@@ -166,6 +171,7 @@ export default {
       searchResults,
       toggleSearchResults,
       closeSearchResults,
+      removeResult,
     };
   },
 };
