@@ -92,8 +92,8 @@ export default {
             limit: 10,
             proximity: props.coords ? `${props.coords.lng},${props.coords.lat}` : "0,0",
           });
-          const data = await axios.get(`api/search/${searchQuery.value}?${params}`);
-          searchData.value = data.data.features;
+          const dataUpdate = await axios.get(`api/search/${searchQuery.value}?${params}`);
+          searchData.value = dataUpdate.data.features;
         }
       }, 750);
     };
